@@ -1,0 +1,66 @@
+module.exports = [{
+    "_id": "6557834529d18784a7d083de",
+    "marque": "Mazda",
+    "modele": "3",
+    "couleur": "rose",
+    "plaque": "F4S0JH",
+    "valet": "5f9d88b9c3b3d3e6f4b6e7a6",
+    "isParked": false,
+    "isMoving": true,
+    "latitude": 46.78897371328417,
+    "longitude": -71.27097290457078,
+    "timeToLeave": new Date().toISOString()
+},
+{
+    "_id": "6557834529d18784a7d083df",
+    "marque": "Toyota",
+    "modele": "Corolla",
+    "couleur": "bleu",
+    "plaque": "G5T1KI",
+    "valet": "5f9d88b9c3b3d3e6f4b6e7a6",
+    "isParked": true,
+    "isMoving": false,
+    "latitude": 46.79148217884645,
+    "longitude": -71.26229167337625,
+    "timeToLeave": new Date(new Date().setHours(10, 0, 0, 0)).toISOString()
+},
+{
+    "_id": "6557834529d18784a7d083e0",
+    "marque": "Honda",
+    "modele": "Civic",
+    "couleur": "vert",
+    "plaque": "H6U2LJ",
+    "valet": "5f9d88b9c3b3d3e6f4b6e7a6",
+    "isParked": true,
+    "isMoving": false,
+    "latitude": 46.792425592479056,
+    "longitude": -71.25953577061999,
+    "timeToLeave": new Date(new Date().setHours(14, 30, 0, 0)).toISOString()
+},
+{
+    "_id": "6557834529d18784a7d083e1",
+    "marque": "Ford",
+    "modele": "Focus",
+    "couleur": "noir",
+    "plaque": "I7V3ML",
+    "valet": "5f9d88b9c3b3d3e6f4b6e7a6",
+    "isParked": true,
+    "isMoving": false,
+    "latitude": 46.7915988057691,
+    "longitude": -71.26652069566308,
+    "timeToLeave": new Date(new Date(new Date().setDate(new Date().getDate() + 1)).setHours(10, 0, 0, 0)).toISOString()
+    
+},
+{
+    "_id": "6557834529d18784a7d083e2",
+    "marque": "Chevrolet",
+    "modele": "Cruze",
+    "couleur": "blanc",
+    "plaque": "J8W4NO",
+    "valet": "5f9d88b9c3b3d3e6f4b6e7a6",
+    "isParked": false,
+    "isMoving": true,
+    "latitude": 46.79244024038833,
+    "longitude": -71.27161877871781,
+    "timeToLeave": new Date().toISOString()
+}]
