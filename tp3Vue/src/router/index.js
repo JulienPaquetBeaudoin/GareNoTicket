@@ -26,8 +26,13 @@ const router = createRouter({
           toast.error("Vous devez être connecté pour accéder à cette page.");
           next({ name: 'Login' })
         } else {
-          
-          next()
+          // Vérifiez si user.voiture est null
+          if (store.state.user.voiture === null) {
+            toast.error("Vous devez avoir une voiture pour accéder à cette page.");
+            next({ name: 'Profil' })
+          } else {
+            next()
+          }
         }
       }
     },

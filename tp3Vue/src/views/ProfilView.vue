@@ -11,7 +11,7 @@
                 <div class="flex-form">
                     <label for="email">Courriel:</label>
                     <input type="text" v-model="user.email" @input="detectChangeInfoUser" />
-                    <span v-if="champError" class="error" v-html="champError"></span>
+                    <span v-if="champErrorUser" class="error" v-html="champErrorUser"></span>
                 </div>
                 <div class="flex-form">
                     <button
@@ -28,7 +28,8 @@
     <SecondTitle :title="'Informations de votre Voiture'" />
     <section>
         <div class="flex flex-col items-center text-2xl text-white m-2">
-            <div class="bg-rose-600 text-center py-[20px] px-[25px] info-perso-div">
+            <div v-if="user.voiture" class="bg-rose-600 text-center py-[20px] px-[25px] info-perso-div">
+
                 <div class="flex-form">
                     <label for="marque">Marque:</label>
                     <input type="text" v-model="voiture.marque" @input="detectChangeInfoVoiture" />
@@ -44,6 +45,36 @@
                 <div class="flex-form">
                     <label for="plaque">Plaque:</label>
                     <input type="text" v-model="voiture.plaque" @input="detectChangeInfoVoiture" />
+                    <span v-if="champErrorCar" class="error" v-html="champErrorCar"></span>
+                </div>
+                <div class="flex-form">
+                    <button
+                        v-bind:disabled="isChangedVoiture"
+                        class="btn-info-user border-2 rounded-md border-purple-600 bg-purple-500 hover:border-indigo-600 hover:bg-indigo-500 px-[10px] py-[5px]"
+                        @click="updateVoiture"
+                    >
+                        Mettre à Jour votre Voiture
+                    </button>
+                </div>
+            </div>
+            <div v-else class="bg-rose-600 text-center py-[20px] px-[25px] info-perso-div">
+
+                <div class="flex-form">
+                    <label for="marque">Marque:</label>
+                    <input type="text" v-model="marqueNull" @input="detectChangeInfoVoiture" />
+                </div>
+                <div class="flex-form">
+                    <label for="modele">Modèle:</label>
+                    <input type="text" v-model="modeleNull" @input="detectChangeInfoVoiture" />
+                </div>
+                <div class="flex-form">
+                    <label for="couleur">Couleur:</label>
+                    <input type="text" v-model="couleurNull" @input="detectChangeInfoVoiture" />
+                </div>
+                <div class="flex-form">
+                    <label for="plaque">Plaque:</label>
+                    <input type="text" v-model="plaqueNull" @input="detectChangeInfoVoiture" />
+                    <span v-if="champErrorCar" class="error" v-html="champErrorCar"></span>
                 </div>
                 <div class="flex-form">
                     <button
@@ -73,7 +104,16 @@ export default {
             isChangedVoiture: true,
             isValidUsername: false,
             isValidEmail: false,
-            champError: ''
+            champErrorUser: '',
+            champErrorCar: '',
+            isValidMarque: false,
+            isValidModele: false,
+            isValidCouleur: false,
+            isValidPlaque: false,
+            marqueNull: '',
+            modeleNull: '',
+            couleurNull: '',
+            plaqueNull: ''
         }
     },
     methods: {
@@ -87,23 +127,28 @@ export default {
             let isValid = false
             this.isValidUsername = false
             this.isValidEmail = false
-            this.champError = ''
+            this.champErrorUser = ''
+            let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+
 
             if (!this.user.username) {
                 this.isValidUsername = false
-                this.champError += 'Veuillez entrer votre nom<br/>'
-                
-            } else {
+                this.champErrorUser += 'Veuillez entrer votre nom<br/>'
+            } 
+            else if(this.user.username.length < 3 || this.user.username.length > 50) {
+                this.isValidUsername = false
+                this.champErrorUser += 'Veuillez entrer un nom entre 3 et 50 caractères<br/>'
+            }else {
                 this.isValidUsername = true
             }
 
             if (!this.user.email) {
                 this.isValidEmail = false
-                this.champError += 'Veuillez entrer votre courriel<br/>'
-                
-            } else if (!this.user.email.includes('@')) {
+                this.champErrorUser += 'Veuillez entrer votre courriel<br/>'
+            }
+            else if (!regex.test(this.user.email)) {
                 this.isValidEmail = false
-                this.champError += 'Veuillez entrer un courriel valide<br/>'
+                this.champErrorUser += 'Veuillez entrer un courriel valide<br/>'
             } else {
                 this.isValidEmail = true
             }
@@ -115,11 +160,11 @@ export default {
             return isValid
         },
         async updateUser(){
-
             let id_user = this.user.userId
             if (this.vaildateUserForm()) {
                 try{
-                    const response = await axios.put(`http://localhost:3000/profil-update/${id_user}`, {
+                    localStorage.removeItem('jwt')
+                    const response = await axios.put(`http://localhost:3000/auth/profil-update/${id_user}`, {
                         username: this.user.username,
                         email: this.user.email,
                         userChange: true,
@@ -131,8 +176,9 @@ export default {
 
                     })  
                     console.log("Reponse", response)
-                    response.data.maVoiture = this.voiture
-                    this.$store.commit('updateUser', response.data)
+                    localStorage.setItem('jwt', response.data.token);
+                    this.$store.commit('updateVoiture', response.data.voiture)
+                    this.$store.commit('updateUser', response.data.user)
                     
                 }
                 catch(error){
@@ -141,9 +187,182 @@ export default {
                             this.toast.error(error.response.data.message);
                         }
                     }
+                    console.log(error)
                 }
             }
-        }
+        },
+        validateCarInfo(){
+            let isValid = false
+            this.isValidMarque = false
+            this.isValidModele = false
+            this.isValidCouleur = false
+            this.isValidPlaque = false
+            this.champErrorCar = ''
+
+            if (this.user.voiture != null){
+                if (!this.voiture.marque) {
+                this.isValidMarque = false
+                this.champErrorCar += 'Veuillez entrer la marque de votre voiture<br/>'   
+                } 
+                else if (this.voiture.marque.length < 1 || this.voiture.marque.length > 50){
+                    this.isValidMarque = false
+                    this.champErrorCar += 'Veuillez entrer une marque entre 1 et 50 caractères<br/>'
+                }
+                else {
+                    this.isValidMarque = true
+                }
+
+                if (!this.voiture.modele) {
+                    this.isValidModele = false
+                    this.champErrorCar += 'Veuillez entrer le modèle de votre voiture<br/>'  
+                }
+                else if (this.voiture.modele.length < 1 || this.voiture.modele.length > 50){
+                    this.isValidModele = false
+                    this.champErrorCar += 'Veuillez entrer un modèle entre 1 et 50 caractères<br/>'
+                } 
+                else {
+                    this.isValidModele = true
+                }
+
+                if (!this.voiture.couleur) {
+                    this.isValidCouleur = false
+                    this.champErrorCar += 'Veuillez entrer la couleur de votre voiture<br/>'
+                } 
+                else if (this.voiture.couleur.length < 3 || this.voiture.couleur.length > 50){
+                    this.isValidCouleur = false
+                    this.champErrorCar += 'Veuillez entrer une couleur entre 1 et 50 caractères<br/>'
+                }
+                else {
+                    this.isValidCouleur = true
+                }
+
+                if (!this.voiture.plaque) {
+                    this.isValidPlaque = false
+                    this.champErrorCar += 'Veuillez entrer la plaque de votre voiture<br/>'
+                } 
+                else if (this.voiture.plaque.length != 6){
+                    this.isValidPlaque = false
+                    this.champErrorCar += 'Veuillez entrer une plaque de 6 caractères<br/>'
+                }
+                else {
+                    this.isValidPlaque = true
+                }
+
+                if (this.isValidMarque && this.isValidModele && this.isValidCouleur && this.isValidPlaque) {
+                    isValid = true
+                }
+
+                return isValid
+            }
+            else {
+                if (!this.marqueNull) {
+                    this.isValidMarque = false
+                    this.champErrorCar += 'Veuillez entrer la marque de votre voiture<br/>'  
+                }
+                else if (this.marqueNull.length < 1 || this.marqueNull.length > 50){
+                    this.isValidMarque = false
+                    this.champErrorCar += 'Veuillez entrer une marque entre 1 et 50 caractères<br/>'
+                }
+                else {
+                    this.isValidMarque = true
+                }
+
+                if (!this.modeleNull) {
+                    this.isValidModele = false
+                    this.champErrorCar += 'Veuillez entrer le modèle de votre voiture<br/>'  
+                }
+                else if (this.modeleNull.length < 1 || this.modeleNull.length > 50){
+                    this.isValidModele = false
+                    this.champErrorCar += 'Veuillez entrer un modèle entre 1 et 50 caractères<br/>'
+                } 
+                else {
+                    this.isValidModele = true
+                }
+
+                if (!this.couleurNull) {
+                    this.isValidCouleur = false
+                    this.champErrorCar += 'Veuillez entrer la couleur de votre voiture<br/>'
+                } 
+                else if (this.couleurNull.length < 3 || this.couleurNull.length > 50){
+                    this.isValidCouleur = false
+                    this.champErrorCar += 'Veuillez entrer une couleur entre 1 et 50 caractères<br/>'
+                }
+                else {
+                    this.isValidCouleur = true
+                }
+
+                if (!this.plaqueNull) {
+                    this.isValidPlaque = false
+                    this.champErrorCar += 'Veuillez entrer la plaque de votre voiture<br/>'
+                } 
+                else if (this.plaqueNull.length != 6){
+                    this.isValidPlaque = false
+                    this.champErrorCar += 'Veuillez entrer une plaque de 6 caractères<br/>'
+                }
+                else {
+                    this.isValidPlaque = true
+                }
+
+                if (this.isValidMarque && this.isValidModele && this.isValidCouleur && this.isValidPlaque) {
+                    isValid = true
+                }
+
+                return isValid
+            }
+
+            
+        },
+        async updateVoiture(){
+            let id_user = this.user.userId
+            if (this.validateCarInfo()) {
+                try{
+                    localStorage.removeItem('jwt')
+                    if(this.user.voiture != null){
+                        const response = await axios.put(`http://localhost:3000/auth/profil-update/${id_user}`, {
+                            username: this.user.username,
+                            email: this.user.email,
+                            userChange: false,
+                            carChange: true,
+                            marque: this.voiture.marque,
+                            modele: this.voiture.modele, 
+                            couleur: this.voiture.couleur,
+                            plaque: this.voiture.plaque
+
+                        })  
+                        console.log("Reponse", response)
+                        localStorage.setItem('jwt', response.data.token);
+                        this.$store.commit('updateVoiture', response.data.voiture)
+                        this.$store.commit('updateUser', response.data.user)
+                    }
+                    else{
+                        const response = await axios.put(`http://localhost:3000/auth/profil-update/${id_user}`, {
+                            username: this.user.username,
+                            email: this.user.email,
+                            userChange: false,
+                            carChange: true,
+                            marque: this.marqueNull,
+                            modele: this.modeleNull, 
+                            couleur: this.couleurNull,
+                            plaque: this.plaqueNull
+
+                        })  
+                        console.log("Reponse", response)
+                        localStorage.setItem('jwt', response.data.token);
+                        this.$store.commit('updateVoiture', response.data.voiture)
+                        this.$store.commit('updateUser', response.data.user)
+                    }
+                }
+                catch(error){
+                    if (error.response) {
+                        if (error.response.data.message) {
+                            this.toast.error(error.response.data.message);
+                        }
+                    }
+                    console.log(error)
+                }
+            }
+        },
+        
     },
     computed: {
         ...mapState(['user', 'voiture'])
