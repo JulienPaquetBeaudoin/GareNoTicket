@@ -23,6 +23,7 @@
 
 <script>
 import axios from 'axios';
+import { mapState } from 'vuex'
 import { useToast } from "vue-toastification";
 export default {
     data() {
@@ -38,6 +39,9 @@ export default {
       // Get toast interface
       const toast = useToast();
       return { toast }
+    },
+    computed: {
+    ...mapState(['user'])
     },
     methods: {
         validateForm() {
@@ -82,7 +86,13 @@ export default {
                     this.toast.success("Vous êtes connecté.", {
                         timeout: 2000,
                     });
-                    this.$router.push({ name: "Home" });
+                    if(this.user.isValet){
+                        this.$router.push({ name: "Valet" });
+                    }
+                    else{
+                        this.$router.push({ name: "Home" });
+                    }
+                   
                 })
                 .catch(error => {
                     if (error.response) {

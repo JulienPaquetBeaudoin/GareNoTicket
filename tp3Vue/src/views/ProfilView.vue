@@ -13,6 +13,15 @@
                     <input type="text" v-model="user.email" @input="detectChangeInfoUser" />
                     <span v-if="champErrorUser" class="error" v-html="champErrorUser"></span>
                 </div>
+                <div v-if="user.isValet" class="flex-form">
+                    <label for="prix">Prix:</label>
+                    <input
+                        type="number"
+                        min="0"
+                        v-model="user.price"
+                        @input="detectChangeInfoUser"
+                    />
+                </div>
                 <div class="flex-form">
                     <button
                         v-bind:disabled="isChangedUser"
@@ -25,8 +34,8 @@
             </div>
         </div>
     </section>
-    <SecondTitle :title="'Informations de votre Voiture'" />
-    <section>
+    <SecondTitle v-if="!user.isValet" :title="'Informations de votre Voiture'" />
+    <section v-if="!user.isValet">
         <div class="flex flex-col items-center text-2xl text-white m-2">
             <div
                 v-if="user.voiture"
@@ -89,7 +98,27 @@
             </div>
         </div>
     </section>
-    <section v-if="user.voiture && voiture.isParked == false && voiture.isMoving == false">
+    <section v-if="user.voiture">
+        <div v-if="voiture.isParked == false && voiture.isMoving == false" class="flex items-center justify-center flex-col div-btn-delete text-2xl text-white">
+            <div class="w-full">
+                <button
+                    @click="confirmationDelete"
+                    class="btn-info-user border-2 rounded-md border-purple-600 bg-purple-500 hover:border-indigo-600 hover:bg-indigo-500 px-[10px] py-[5px]"
+                >
+                    Supprimer votre Compte
+                </button>
+            </div>
+            <div class="w-full" v-if="isConfirmDelete">
+                <button
+                    @click="deleteUser"
+                    class="btn-info-user border-2 rounded-md border-purple-600 bg-purple-500 hover:border-indigo-600 hover:bg-indigo-500 px-[10px] py-[5px]"
+                >
+                    Confirmermation de la Suppression
+                </button>
+            </div>
+        </div>
+    </section>
+    <section v-else>
         <div class="flex items-center justify-center flex-col div-btn-delete text-2xl text-white">
             <div class="w-full">
                 <button
@@ -124,6 +153,7 @@ export default {
             isChangedVoiture: true,
             isValidUsername: false,
             isValidEmail: false,
+            isValidPrice: false,
             champErrorUser: '',
             champErrorCar: '',
             isValidMarque: false,
@@ -148,6 +178,7 @@ export default {
             let isValid = false
             this.isValidUsername = false
             this.isValidEmail = false
+            this.isValidPrice = false
             this.champErrorUser = ''
             let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
@@ -161,6 +192,18 @@ export default {
                 this.isValidUsername = true
             }
 
+            if (this.user.isValet) {
+                if (!this.user.price) {
+                    this.isValidPrice = false
+                    this.champErrorUser += 'Veuillez entrer votre prix<br/>'
+                } else if (this.user.price < 0) {
+                    this.isValidPrice = false
+                    this.champErrorUser += 'Veuillez entrer un prix supérieur<br/>'
+                } else {
+                    this.isValidPrice = true
+                }
+            }
+
             if (!this.user.email) {
                 this.isValidEmail = false
                 this.champErrorUser += 'Veuillez entrer votre courriel<br/>'
@@ -170,42 +213,85 @@ export default {
             } else {
                 this.isValidEmail = true
             }
-
-            if (this.isValidUsername && this.isValidEmail) {
-                isValid = true
+            if (this.user.isValet) {
+                if (this.isValidUsername && this.isValidEmail && this.isValidPrice) {
+                    isValid = true
+                }
+            } else {
+                if (this.isValidUsername && this.isValidEmail) {
+                    isValid = true
+                }
             }
 
             return isValid
         },
         async updateUser() {
             let id_user = this.user.userId
+            if (id_user == null) {
+                id_user = this.user._id
+            }
             if (this.vaildateUserForm()) {
-                try {
-                    localStorage.removeItem('jwt')
-                    const response = await axios.put(
-                        `http://localhost:3000/auth/profil-update/${id_user}`,
-                        {
-                            username: this.user.username,
-                            email: this.user.email,
-                            userChange: true,
-                            carChange: false,
-                            marque: this.voiture.marque,
-                            modele: this.voiture.modele,
-                            couleur: this.voiture.couleur,
-                            plaque: this.voiture.plaque
+                if (!this.user.isValet && this.user.voiture != null) {
+                    if (this.voiture.isParked == false && this.voiture.isMoving == false)
+                        try {
+                            localStorage.removeItem('jwt')
+
+                            const response = await axios.put(
+                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                {
+                                    username: this.user.username,
+                                    email: this.user.email,
+                                    price: this.user.price,
+                                    userChange: true,
+                                    carChange: false,
+                                    marque: this.voiture.marque,
+                                    modele: this.voiture.modele,
+                                    couleur: this.voiture.couleur,
+                                    plaque: this.voiture.plaque
+                                }
+                            )
+                            console.log('Reponse', response)
+                            localStorage.setItem('jwt', response.data.token)
+                            this.$store.commit('updateVoiture', response.data.voiture)
+                            this.$store.commit('updateUser', response.data.user)
+                        } catch (error) {
+                            if (error.response) {
+                                if (error.response.data.message) {
+                                    this.toast.error(error.response.data.message)
+                                }
+                            }
+                            console.log(error)
                         }
-                    )
-                    console.log('Reponse', response)
-                    localStorage.setItem('jwt', response.data.token)
-                    this.$store.commit('updateVoiture', response.data.voiture)
-                    this.$store.commit('updateUser', response.data.user)
-                } catch (error) {
-                    if (error.response) {
-                        if (error.response.data.message) {
-                            this.toast.error(error.response.data.message)
-                        }
+                    else {
+                        this.toast.error(
+                            'Vous ne pouvez pas modifier votre profil lorsque votre voiture est en mouvement ou stationnée'
+                        )
                     }
-                    console.log(error)
+                } else {
+                    try {
+                        localStorage.removeItem('jwt')
+                        const response = await axios.put(
+                            `http://localhost:3000/auth/profil-valet-update/${id_user}`,
+                            {
+                                username: this.user.username,
+                                email: this.user.email,
+                                price: this.user.price
+                            }
+                        )
+                        console.log('Reponse', response)
+
+                        localStorage.setItem('jwt', response.data.token)
+                        this.$store.commit('updateVoiture', null)
+                        this.$store.commit('updateUser', response.data.user)
+                        console.log('User', this.user)
+                    } catch (error) {
+                        if (error.response) {
+                            if (error.response.data.message) {
+                                this.toast.error(error.response.data.message)
+                            }
+                        }
+                        console.log(error)
+                    }
                 }
             }
         },
@@ -324,54 +410,115 @@ export default {
             }
         },
         async updateVoiture() {
-            let id_user = this.user.userId
+            let id_user
+            if (this.user.userId === null) {
+                id_user = this.user._id
+            } else {
+                id_user = this.user.userId
+            }
             if (this.validateCarInfo()) {
-                try {
-                    localStorage.removeItem('jwt')
-                    if (this.user.voiture != null) {
-                        const response = await axios.put(
-                            `http://localhost:3000/auth/profil-update/${id_user}`,
-                            {
-                                username: this.user.username,
-                                email: this.user.email,
-                                userChange: false,
-                                carChange: true,
-                                marque: this.voiture.marque,
-                                modele: this.voiture.modele,
-                                couleur: this.voiture.couleur,
-                                plaque: this.voiture.plaque
+                if (this.user.voiture != null) {
+                    if (this.voiture.isParked == false && this.voiture.isMoving == false) {
+                        try {
+                            localStorage.removeItem('jwt')
+                            if (this.user.voiture != null) {
+                                const response = await axios.put(
+                                    `http://localhost:3000/auth/profil-update/${id_user}`,
+                                    {
+                                        username: this.user.username,
+                                        email: this.user.email,
+                                        userChange: false,
+                                        carChange: true,
+                                        marque: this.voiture.marque,
+                                        modele: this.voiture.modele,
+                                        couleur: this.voiture.couleur,
+                                        plaque: this.voiture.plaque
+                                    }
+                                )
+                                console.log('Reponse', response)
+                                localStorage.setItem('jwt', response.data.token)
+                                this.$store.commit('updateVoiture', response.data.voiture)
+                                this.$store.commit('updateUser', response.data.user)
+                            } else {
+                                const response = await axios.put(
+                                    `http://localhost:3000/auth/profil-update/${id_user}`,
+                                    {
+                                        username: this.user.username,
+                                        email: this.user.email,
+                                        userChange: false,
+                                        carChange: true,
+                                        marque: this.marqueNull,
+                                        modele: this.modeleNull,
+                                        couleur: this.couleurNull,
+                                        plaque: this.plaqueNull
+                                    }
+                                )
+                                console.log('Reponse', response)
+                                localStorage.setItem('jwt', response.data.token)
+                                this.$store.commit('updateVoiture', response.data.voiture)
+                                this.$store.commit('updateUser', response.data.user)
                             }
-                        )
-                        console.log('Reponse', response)
-                        localStorage.setItem('jwt', response.data.token)
-                        this.$store.commit('updateVoiture', response.data.voiture)
-                        this.$store.commit('updateUser', response.data.user)
-                    } else {
-                        const response = await axios.put(
-                            `http://localhost:3000/auth/profil-update/${id_user}`,
-                            {
-                                username: this.user.username,
-                                email: this.user.email,
-                                userChange: false,
-                                carChange: true,
-                                marque: this.marqueNull,
-                                modele: this.modeleNull,
-                                couleur: this.couleurNull,
-                                plaque: this.plaqueNull
+                        } catch (error) {
+                            if (error.response) {
+                                if (error.response.data.message) {
+                                    this.toast.error(error.response.data.message)
+                                }
                             }
-                        )
-                        console.log('Reponse', response)
-                        localStorage.setItem('jwt', response.data.token)
-                        this.$store.commit('updateVoiture', response.data.voiture)
-                        this.$store.commit('updateUser', response.data.user)
-                    }
-                } catch (error) {
-                    if (error.response) {
-                        if (error.response.data.message) {
-                            this.toast.error(error.response.data.message)
+                            console.log(error)
                         }
+                    } else {
+                        this.toast.error(
+                            'Vous ne pouvez pas modifier votre profil lorsque votre voiture est en mouvement ou stationnée'
+                        )
                     }
-                    console.log(error)
+                } else {
+                    try {
+                        localStorage.removeItem('jwt')
+                        if (this.user.voiture != null) {
+                            const response = await axios.put(
+                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                {
+                                    username: this.user.username,
+                                    email: this.user.email,
+                                    userChange: false,
+                                    carChange: true,
+                                    marque: this.voiture.marque,
+                                    modele: this.voiture.modele,
+                                    couleur: this.voiture.couleur,
+                                    plaque: this.voiture.plaque
+                                }
+                            )
+                            console.log('Reponse', response)
+                            localStorage.setItem('jwt', response.data.token)
+                            this.$store.commit('updateVoiture', response.data.voiture)
+                            this.$store.commit('updateUser', response.data.user)
+                        } else {
+                            const response = await axios.put(
+                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                {
+                                    username: this.user.username,
+                                    email: this.user.email,
+                                    userChange: false,
+                                    carChange: true,
+                                    marque: this.marqueNull,
+                                    modele: this.modeleNull,
+                                    couleur: this.couleurNull,
+                                    plaque: this.plaqueNull
+                                }
+                            )
+                            console.log('Reponse', response)
+                            localStorage.setItem('jwt', response.data.token)
+                            this.$store.commit('updateVoiture', response.data.voiture)
+                            this.$store.commit('updateUser', response.data.user)
+                        }
+                    } catch (error) {
+                        if (error.response) {
+                            if (error.response.data.message) {
+                                this.toast.error(error.response.data.message)
+                            }
+                        }
+                        console.log(error)
+                    }
                 }
             }
         },
@@ -390,7 +537,7 @@ export default {
                 localStorage.removeItem('jwt')
                 this.$store.dispatch('logoutUser')
                 this.toast.success('Votre compte a été supprimé')
-                this.$router.push({ name: 'Login' });
+                this.$router.push({ name: 'Login' })
             } catch (error) {
                 if (error.response) {
                     if (error.response.data.message) {
@@ -406,6 +553,7 @@ export default {
     },
     mounted() {
         this.$store.dispatch('getUser')
+        console.log('user init', this.user)
     },
     setup() {
         const toast = useToast()
@@ -460,7 +608,7 @@ button:disabled {
     margin-top: 10px;
 }
 
-.div-btn-delete{
+.div-btn-delete {
     width: 30%;
     margin: 0 auto;
     margin-bottom: 20px;

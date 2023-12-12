@@ -19,7 +19,7 @@
                 </li>
             </ul>
             <ul class="flex justify-around" v-else>
-                <li>
+                <li v-if="!user.isValet">
                     <router-link
                         class="border-2 rounded-md border-rose-500 bg-rose-400 px-[10px] py-[3px] hover:border-purple-400 hover:bg-purple-300"
                         :to="{ name: 'Home' }"
@@ -40,7 +40,7 @@
                         >Profil</router-link
                     >
                 </li>
-                <li>
+                <li v-if="!user.isValet">
                     <router-link
                         class="ml-6 border-2 rounded-md border-rose-500 bg-rose-400 px-[10px] py-[3px] hover:border-purple-400 hover:bg-purple-300"
                         :to="{ name: 'Transaction' }"

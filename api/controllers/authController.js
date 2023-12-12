@@ -88,67 +88,6 @@ exports.signup = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-// exports.updateProfile = (req, res, next) => {
-//   const userId = req.params.userId;
-//   const { email, username, userChange, carChange, marque, modele, couleur, plaque } = req.body;
-//   console.log("Id User", userId)
-//   // Trouver l'utilisate ur par son ID
-//   User.findById(userId)
-//       .then((user) => {
-//         console.log("User", user)
-//           if (!user) {
-//               return res.status(404).json({ message: "L'utilisateur n'existe pas" });
-//           }
-
-//           // Mettre à jour le profil de l'utilisateur si userChange est vrai
-//           if (userChange) {
-//             user.username = username;
-//             user.email = email;
-//             return user.save();
-//           }
-
-//           // Sauvegarder l'utilisateur mis à jour
-//           return Promise.resolve(user);
-//       })
-//       .then((updatedUser) => {
-//           // Chercher la voiture de l'utilisateur
-//           return Car.findById(updatedUser.voiture)
-//               .then((car) => {
-//                   // Mettre à jour les informations de la voiture si carChange est vrai
-//                   if (carChange) {
-//                     car.marque = marque;
-//                     car.modele = modele;
-//                     car.couleur = couleur
-//                     car.plaque = plaque
-//                     // Ajoutez d'autres champs de voiture ici si nécessaire
-//                     return car.save();
-//                   }
-//                   return Promise.resolve(car);
-//               })
-//               .then((updatedCar) => {
-//                   // Générer un nouveau token JWT
-//                   const token = jwt.sign(
-//                       {
-//                           userId: updatedUser._id,
-//                           email: updatedUser.email,
-//                           username: updatedUser.username,
-//                           isValet: updatedUser.isValet,
-//                           price: updatedUser.price,
-//                           voiture: updatedUser.voiture,
-//                           maVoiture: updatedCar,
-//                       },
-//                       process.env.SECRET_JWT,
-//                       {
-//                           expiresIn: "24h",
-//                       }
-//                   );
-//                   console.log("token", token)
-//                   // Envoyer le token et l'utilisateur mis à jour dans la réponse
-//                   res.status(200).json({ token, user: updatedUser, voiture: updatedCar });
-//               });
-//       })
-//       .catch((err) => next(err));
-// };
 
 exports.updateProfile = (req, res, next) => {
   const userId = req.params.userId;
@@ -216,6 +155,44 @@ exports.updateProfile = (req, res, next) => {
 
                   res.status(200).json({ token, user: updatedUser, voiture: updatedCar });
               });
+      })
+      .catch((err) => next(err));
+};
+
+
+exports.updateProfileValet = (req, res, next) => {
+  const userId = req.params.userId;
+  const { email, username, price } = req.body;
+
+  User.findById(userId)
+      .then((user) => {
+          if (!user) {
+              return res.status(404).json({ message: "L'utilisateur n'existe pas" });
+          }
+
+          user.username = username;
+          user.email = email;
+          user.price = price;
+          
+          return user.save();
+      })
+      .then((updatedUser) => {
+          const token = jwt.sign(
+              {
+                  userId: updatedUser._id,
+                  email: updatedUser.email,
+                  username: updatedUser.username,
+                  isValet: updatedUser.isValet,
+                  price: updatedUser.price,
+                  voiture: updatedUser.voiture,
+              },
+              process.env.SECRET_JWT,
+              {
+                  expiresIn: "24h",
+              }
+          );
+
+          res.status(200).json({ token, user: updatedUser });
       })
       .catch((err) => next(err));
 };

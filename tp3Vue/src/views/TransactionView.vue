@@ -1,10 +1,14 @@
 <template>
     <MainTitle :title="'Transaction'" />
     <section>
-        <div class="flex border-2 border-rose-600 bg-rose-400 div-payer-facture items-center justify-around text-white">
-            <p class="border-2 rounded-md border-purple-600 bg-purple-500 py-[5px] px-[20px]">Votre Facture: {{ this.montantAPayer }}$</p>
+        <div
+            class="flex border-2 border-rose-600 bg-rose-400 div-payer-facture items-center justify-around text-white"
+        >
+            <p class="border-2 rounded-md border-purple-600 bg-purple-500 py-[5px] px-[20px]">
+                Votre Facture: {{ this.montantAPayer }}$
+            </p>
             <button
-                class="border-2 rounded-md border-purple-600 bg-purple-500  hover:border-indigo-600 hover:bg-indigo-500 px-[10px] py-[5px]"
+                class="border-2 rounded-md border-purple-600 bg-purple-500 hover:border-indigo-600 hover:bg-indigo-500 px-[10px] py-[5px]"
                 @click="payerFacture"
             >
                 Payer
@@ -29,6 +33,11 @@
                             {{ new Date(facture.createdAt).toLocaleString() }}
                         </td>
                         <td class="border border-rose-600">{{ facture.price }}$</td>
+                    </tr>
+                    <tr v-if="factures.length === 0">
+                        <td colspan="2" class="border border-rose-600 text-center">
+                            Vous n'avez pas de transactions
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -58,6 +67,11 @@
                             <span v-else class="non-paye">Non Payé</span>
                         </td>
                     </tr>
+                    <tr v-if="historique.length === 0">
+                        <td colspan="3" class="border border-rose-600 text-center">
+                            Vous n'avez pas de factures
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
@@ -77,20 +91,20 @@ export default {
             token: localStorage.getItem('jwt'),
             factures: {},
             historique: {},
-            histoIds: [],
+            histoIds: []
         }
     },
     setup() {
         // Get toast interface
-        const toast = useToast();
-        return { toast };
+        const toast = useToast()
+        return { toast }
     },
     methods: {
         async getFactureUser() {
             try {
                 const response = await axios.get('http://localhost:3000/facture', {
                     headers: {
-                        'Authorization': `Bearer ${this.token}`
+                        Authorization: `Bearer ${this.token}`
                     }
                 })
                 this.factures = response.data.factures
@@ -100,42 +114,46 @@ export default {
         },
         calculerMontantAPayer() {
             this.montantAPayer = Object.values(this.historique).reduce((total, facture) => {
-                return facture.isPaid ? total : total + facture.price;
-            }, 0);
+                return facture.isPaid ? total : total + facture.price
+            }, 0)
         },
         async getHistoriqueFacture() {
             try {
                 const response = await axios.get('http://localhost:3000/historique', {
                     headers: {
-                        'Authorization': `Bearer ${this.token}`
+                        Authorization: `Bearer ${this.token}`
                     }
                 })
-                this.historique = response.data.histo                
+                this.historique = response.data.histo
             } catch (error) {
                 console.log(error)
             }
         },
         async payerFacture() {
             try {
-                const reponse =await axios.put('http://localhost:3000/effectuerPaiement', {
-                    price: this.montantAPayer
-                }, {
-                    headers: {
-                        'Authorization': `Bearer ${this.token}`
+                const reponse = await axios.put(
+                    'http://localhost:3000/effectuerPaiement',
+                    {
+                        price: this.montantAPayer
+                    },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${this.token}`
+                        }
                     }
-                })
+                )
                 this.getFactureUser()
                 this.getHistoriqueFacture().then(() => {
                     this.calculerMontantAPayer()
-                })   
-                this.toast.success(`${reponse.data.message}`), {
-                    timeout: 2000
-                };
+                })
+                this.toast.success(`${reponse.data.message}`),
+                    {
+                        timeout: 2000
+                    }
             } catch (error) {
                 console.log(error)
             }
         }
-    
     },
     computed: {
         ...mapState(['user', 'voiture'])
@@ -179,6 +197,6 @@ th {
 }
 
 .paye {
-    color: rgb(51, 240, 70)
+    color: rgb(51, 240, 70);
 }
 </style>
