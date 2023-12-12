@@ -6,6 +6,7 @@ import ValetView from '../views/ValetView.vue'
 import TransactionView from '../views/TransactionView.vue'
 import DeplacementView from '../views/DeplacementView.vue'
 import ProfilView from '../views/ProfilView.vue'
+import NotFound404View from '../views/NotFound404View.vue'
 import store from '../store'
 import { useToast } from "vue-toastification";
 
@@ -75,19 +76,54 @@ const router = createRouter({
     {
       path: '/transaction',
       name: 'Transaction',
-      component: TransactionView
-      
+      component: TransactionView,
+      beforeEnter: (to, from, next) => {
+        if (store.state.user === null) {
+          toast.error("Vous devez être connecté pour accéder à cette page.");
+          next({ name: 'Login' })
+        } else {
+          next()
+        }
+      }
     },
     {
       path: '/profil',
       name: 'Profil',
-      component: ProfilView
+      component: ProfilView,
+      beforeEnter: (to, from, next) => {
+        if (store.state.user === null) {
+          toast.error("Vous devez être connecté pour accéder à cette page.");
+          next({ name: 'Login' })
+        } else {
+          next()
+        }
+      }
 
     },
     {
       path: '/deplacement/:id_voiture/:id_user',
       name: 'Deplacement',
-      component: DeplacementView
+      component: DeplacementView,
+      beforeEnter: (to, from, next) => {
+        if (store.state.user === null) {
+          toast.error("Vous devez être connecté pour accéder à cette page.");
+          next({ name: 'Login' })
+        } else {
+          if (store.state.user.voiture === null) {
+            toast.error("Vous devez avoir une voiture pour accéder à cette page.");
+            next({ name: 'Profil' })
+          } else {
+            next()
+          }
+        }
+
+        
+      }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'NotFound',
+      component: NotFound404View
     }
   ]
 })

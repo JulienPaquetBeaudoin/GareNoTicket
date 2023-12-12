@@ -24,14 +24,8 @@ router.put('/car/move/:id', usersController.moveCar);
 // Mise à jour de l'état d'une voiture
 router.put('/car/recup-car/:id', usersController.recupVoiture);
 
-// Mise à jour d'un utilisateur
-router.put('/user/:userId', usersController.updateUser);
-
 // Suppression de l'utilisateur actuellement connecté
-router.delete('/user/', usersController.deleteUser);
-
-// Mise à jour d'une voiture
-router.put('/car/:userId', usersController.updateCar);
+router.delete('/user/', isAuth, usersController.deleteUser);
 
 module.exports = router;
 

@@ -32,7 +32,10 @@ exports.getUser = async (req, res, next) => {
     const userId = req.user.userId;
     const user = await checkUserExists(userId);
     res.status(200).json({
-      user: user
+      user: user,
+      links: {
+        delete: `${url_base}/user/`
+      }
     });
   } catch (err) {
     next(err);
@@ -164,83 +167,32 @@ exports.recupVoiture = async (req, res, next) => {
   }
 };
 
-exports.updateUser = async (req, res, next) => { 
-  const userId = req.params.userId;
-  const { username, email } = req.body;
-  console.log("Id User",userId)
-  try {
-    const user = await User.findById(userId);
-    console.log("User", user)
-    if (!user) {
-      const error = new Error('Aucun utilisateur trouvé avec cet ID.');
-      error.statusCode = 404;
-      throw error;
-    }
 
-    // Mettre à jour l'email et le nom d'utilisateur de l'utilisateur
-    if (email) {
-      user.email = email;
-    }
-    if (username) {
-      user.username = username;
-    }
-
-    // Sauvegarder l'utilisateur mis à jour
-    const result = await user.save();
-
-    res.status(200).json({
-      message: 'Profil mis à jour avec succès.',
-      user: result
-    });
-  } catch (err) {
-    if (err.code === 11000) {
-      err = new Error('Un compte possède déjà ce courriel.');
-      err.statusCode = 400;
-    }
-    next(err);
-  }
-}
-
-exports.updateCar = async (req, res, next) => { 
-  const voitureId = req.params.id;
-  const updatedCar = req.body;
-
-  try {
-    const voiture = await Voiture.findById(voitureId);
-    if (!voiture) {
-      const error = new Error('Aucune voiture trouvée avec cet ID.');
-      error.statusCode = 404;
-      throw error;
-    }
-
-    // Mettre à jour les champs de la voiture
-    for (let key in updatedCar) {
-      voiture[key] = updatedCar[key];
-    }
-
-    // Sauvegarder la voiture mise à jour
-    const result = await voiture.save();
-
-    res.status(200).json({
-      message: 'Voiture mise à jour avec succès.',
-      voiture: result
-    });
-  } catch (err) {
-    next(err);
-  }
-}
 
 
 
 exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    const user = await checkUserExists(userId);
-    await user.remove();
+    //Cela fait des erreurs si on supprime comme voiture n'est pas un ID
+    //const user = await checkUserExists(userId);
+    const user = await User.findById(userId);
+    
+    if (!user) {
+      const error = new Error('L\'utilisateur n\'existe pas.');
+      error.statusCode = 404;
+      throw error;
+    }
     if (user.voiture) {
       const voiture = await Voiture.findById(user.voiture);
-      await voiture.remove();
+      if(!voiture){
+        const error = new Error('La voiture n\'existe pas.');
+        error.statusCode = 404;
+        throw error;
+      }
+      await Voiture.findByIdAndRemove(user.voiture);
     }
+    await User.findByIdAndRemove(userId);
     res.status(204).send();
   } catch (err) {
     next(err);
