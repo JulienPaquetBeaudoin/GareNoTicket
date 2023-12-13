@@ -254,6 +254,7 @@ export default {
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
+                            this.toast.success('Votre profil a été mis à jour')
                         } catch (error) {
                             if (error.response) {
                                 if (error.response.data.message) {
@@ -283,7 +284,7 @@ export default {
                         localStorage.setItem('jwt', response.data.token)
                         this.$store.commit('updateVoiture', null)
                         this.$store.commit('updateUser', response.data.user)
-                        console.log('User', this.user)
+                        this.toast.success('Votre profil a été mis à jour')
                     } catch (error) {
                         if (error.response) {
                             if (error.response.data.message) {
@@ -437,6 +438,7 @@ export default {
                                 localStorage.setItem('jwt', response.data.token)
                                 this.$store.commit('updateVoiture', response.data.voiture)
                                 this.$store.commit('updateUser', response.data.user)
+                                this.toast.success('Votre voiture a été mise à jour')
                             } else {
                                 const response = await axios.put(
                                     `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
@@ -455,6 +457,7 @@ export default {
                                 localStorage.setItem('jwt', response.data.token)
                                 this.$store.commit('updateVoiture', response.data.voiture)
                                 this.$store.commit('updateUser', response.data.user)
+                                this.toast.success('Votre voiture a été mise à jour')
                             }
                         } catch (error) {
                             if (error.response) {
@@ -490,6 +493,7 @@ export default {
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
+                            this.toast.success('Votre voiture a été mise à jour')
                         } else {
                             const response = await axios.put(
                                 `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
@@ -508,6 +512,7 @@ export default {
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
+                            this.toast.success('Votre voiture a été mise à jour')
                         }
                     } catch (error) {
                         if (error.response) {

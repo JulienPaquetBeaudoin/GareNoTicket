@@ -24,16 +24,21 @@ const router = createRouter({
         // Vérifiez si le token JWT existe
         const token = localStorage.getItem('jwt');
         if (!token) {
-          toast.error("Vous devez être connecté pour accéder à cette page.");
+          toast.error("Vous devez être connecté pour accéder à Ma Place.");
           next({ name: 'Login' })
         } else {
           // Vérifiez si user.voiture est null
-          if (store.state.user.voiture === null) {
-            toast.error("Vous devez avoir une voiture pour accéder à cette page.");
-            next({ name: 'Profil' })
+          if (!store.state.user.isValet) {
+            if (store.state.user.voiture === null) {
+              toast.error("Vous devez avoir une voiture pour accéder à Ma Place.");
+              next({ name: 'Profil' })
+            } else {
+              next()
+            }
           } else {
-            next()
+            next({ name: 'Valet' })
           }
+          
         }
       }
     },
@@ -56,7 +61,7 @@ const router = createRouter({
         if (store.state.user.isValet) {
           next();
         } else {
-          toast.error("Vous devez être un valet pour accéder à cette page.");
+          toast.error("Vous devez être un valet pour accéder à Valet.");
           next({ name: 'Home' });
         }
       }
@@ -79,7 +84,7 @@ const router = createRouter({
       component: TransactionView,
       beforeEnter: (to, from, next) => {
         if (store.state.user === null) {
-          toast.error("Vous devez être connecté pour accéder à cette page.");
+          toast.error("Vous devez être connecté pour accéder à Transaction.");
           next({ name: 'Login' })
         } else {
           next()
@@ -92,7 +97,7 @@ const router = createRouter({
       component: ProfilView,
       beforeEnter: (to, from, next) => {
         if (store.state.user === null) {
-          toast.error("Vous devez être connecté pour accéder à cette page.");
+          toast.error("Vous devez être connecté pour accéder à Profil.");
           next({ name: 'Login' })
         } else {
           next()
@@ -106,18 +111,17 @@ const router = createRouter({
       component: DeplacementView,
       beforeEnter: (to, from, next) => {
         if (store.state.user === null) {
-          toast.error("Vous devez être connecté pour accéder à cette page.");
+          toast.error("Vous devez être connecté pour accéder à Deplacement.");
           next({ name: 'Login' })
         } else {
-          if (store.state.user.voiture === null) {
-            toast.error("Vous devez avoir une voiture pour accéder à cette page.");
-            next({ name: 'Profil' })
-          } else {
+          if (!store.state.user.isValet) {
+            toast.error("Vous devez être un valet pour accéder à Deplacement.");
+            next({ name: 'Home' })
+          }
+          else {
             next()
           }
         }
-
-        
       }
     },
     {

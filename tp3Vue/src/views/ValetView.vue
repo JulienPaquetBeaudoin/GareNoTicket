@@ -88,6 +88,7 @@ export default {
         }
     },
     async mounted() {
+        console.log('mounted called')
         this.initMap()
         this.findUserLocation()
         this.getVoitureParked()
@@ -207,7 +208,14 @@ export default {
             }
         },
         navigateDeplacement(idVoiture, idUser) {
-            this.$router.push({ name: 'Deplacement', params: { id_voiture: idVoiture, id_user: idUser } })
+            console.log('navigateDeplacement called')
+            console.log('idVoiture', idVoiture)
+            console.log('idUser', idUser)
+            
+            //this.$router.push({ name: 'Deplacement', params: { id_voiture: idVoiture, id_user: idUser } })
+            this.$router.push({ path: `/deplacement/${idVoiture}/${idUser}` })
+            .catch(error => console.error(error));
+            
         }
     }
 }

@@ -23,7 +23,7 @@
                     <router-link
                         class="border-2 rounded-md border-rose-500 bg-rose-400 px-[10px] py-[3px] hover:border-purple-400 hover:bg-purple-300"
                         :to="{ name: 'Home' }"
-                        >My Place</router-link
+                        >Ma Place</router-link
                     >
                 </li>
                 <li v-if="user.isValet">

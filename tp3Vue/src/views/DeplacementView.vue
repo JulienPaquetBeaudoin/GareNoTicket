@@ -192,10 +192,6 @@ export default {
     },
     async mounted() {
         this.$store.dispatch('getUser');
-        if (this.user.maVoiture === null) {
-            this.$router.push({ name: 'Profil' });
-            return;
-        }
         this.initMap();
         this.getVoitureParked();
         this.findUserLocation();

@@ -90,7 +90,7 @@ exports.updateCarLocation = async (req, res, next) => {
     voiture.isMoving = false;
 
     const now = new Date();
-    if ((now.getHours() >= 9 && now.getHours() < 11) || ((now.getHours() === 13 && now.getMinutes() >= 30) || (now.getHours() > 13 && now.getHours() < 17))) {
+    if ((now.getHours() >= 9 && now.getHours() < 11) || (now.getHours() === 13 && now.getMinutes() >= 30) || (now.getHours() > 13 && now.getHours() < 17)) {
       voiture.timeToLeave = new Date(now.getTime() + 60*60000); // Ajoute 60 minutes à l'heure actuelle
     }
     else {
