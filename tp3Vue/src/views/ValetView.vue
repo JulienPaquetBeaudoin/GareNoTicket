@@ -190,7 +190,16 @@ export default {
         },
         tempsRestant(user) {
             const dateFuture = new Date(user.voiture.timeToLeave)
+            let currentMonth = dateFuture.getMonth();
+            if (currentMonth >= 10 || currentMonth <= 2) { // Les mois en JavaScript sont de 0 (janvier) à 11 (décembre)
+                dateFuture.setHours(dateFuture.getHours() + 5);
+            } else {
+                dateFuture.setHours(dateFuture.getHours() + 4);
+            }
             const dateNow = new Date()
+            console.log('user', user.username)
+            console.log('dateFuture', dateFuture)
+            console.log('dateNow', dateNow)
             this.remainingTimes[user._id] = Math.round(
                 (dateFuture.getTime() - dateNow.getTime()) / 1000
             )
@@ -207,14 +216,9 @@ export default {
                     .openOn(this.map);
             }
         },
-        navigateDeplacement(idVoiture, idUser) {
-            console.log('navigateDeplacement called')
-            console.log('idVoiture', idVoiture)
-            console.log('idUser', idUser)
-            
-            //this.$router.push({ name: 'Deplacement', params: { id_voiture: idVoiture, id_user: idUser } })
-            this.$router.push({ path: `/deplacement/${idVoiture}/${idUser}` })
-            .catch(error => console.error(error));
+        navigateDeplacement(idVoiture, idUser) {       
+            this.$router.push({ name: 'Deplacement', params: { id_voiture: idVoiture, id_user: idUser } })
+            // this.$router.push({ path: `/deplacement/${idVoiture}/${idUser}` })
             
         }
     }

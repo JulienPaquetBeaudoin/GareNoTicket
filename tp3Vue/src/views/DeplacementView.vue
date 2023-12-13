@@ -35,9 +35,10 @@
     <div class="redirect-button flex">
         <button
             v-if="showRedirectButton"
+            @click="retournerVersValet"
             class="border-2 rounded-md border-rose-500 bg-rose-400 px-[10px] py-[5px] hover:border-purple-500 hover:bg-purple-400"
         >
-            <router-link :to="{ name: 'Valet' }">Retourner vers Valet</router-link>
+            Retourner vers Valet
         </button>
     </div>
     
@@ -189,6 +190,9 @@ export default {
                 });
             }
         },
+        retournerVersValet(){
+            this.$router.push({ name: 'Valet' });
+        }
     },
     async mounted() {
         this.$store.dispatch('getUser');
