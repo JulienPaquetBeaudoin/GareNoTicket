@@ -90,6 +90,12 @@ exports.updateCarLocation = async (req, res, next) => {
     voiture.isMoving = false;
 
     const now = new Date();
+    let offset = -5; // Décalage par défaut pour novembre à mars
+    
+    if (now.getMonth() > 2 && now.getMonth() < 10) {
+      offset = -4; // Décalage pour avril à octobre
+    }
+    now.setHours(now.getHours() + offset);
     console.log("Now", now);
     console.log("Hours",now.getHours());
     
