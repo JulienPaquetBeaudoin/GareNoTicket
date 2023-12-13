@@ -100,7 +100,7 @@ exports.updateCarLocation = async (req, res, next) => {
         tomorrow.setHours(10);
         tomorrow.setMinutes(0);
       }
-      else if (now.getHours() >= 11 && (date.getHours() === 12 && date.getMinutes() >= 30) || (date.getHours() < 12)) {
+      else if (now.getHours() >= 11 && (now.getHours() === 12 && now.getMinutes() >= 30) || (now.getHours() < 12)) {
         tomorrow.setHours(14);
         tomorrow.setMinutes(30);
       } else {
