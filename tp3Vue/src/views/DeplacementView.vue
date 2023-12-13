@@ -115,7 +115,7 @@ export default {
         },
         async getVoitureParked() {
             try {
-                const response = await axios.get(`http://localhost:3000/car/${this.idCar}`);
+                const response = await axios.get(`https://gare-no-ticket-iota.vercel.app/car/${this.idCar}`);
                 this.car = response.data.voiture;
                 console.log('response', response.data);
                 this.markerCar = L.marker([response.data.voiture.latitude, response.data.voiture.longitude], {
@@ -132,7 +132,7 @@ export default {
                 this.markerCar.remove();
                 this.moveIsDisabled = true;
                 this.confirmationIsDisabled = false;
-                const response = await axios.put(`http://localhost:3000/car/move/${this.idCar}`);
+                const response = await axios.put(`https://gare-no-ticket-iota.vercel.app/car/move/${this.idCar}`);
                 this.car = response.data.voiture;
                 this.toast.info(`${response.data.message}`, {
                     timeout: 2000
@@ -146,11 +146,11 @@ export default {
             try {
                 const token = localStorage.getItem('jwt');
                 const position = this.markerValet.getLatLng();
-                await axios.put(`http://localhost:3000/car/location/${this.idCar}`, {
+                await axios.put(`https://gare-no-ticket-iota.vercel.app/car/location/${this.idCar}`, {
                     latitude: position.lat,
                     longitude: position.lng
                 });
-                await axios.put(`http://localhost:3000/nouveauDeplacement`, {
+                await axios.put(`https://gare-no-ticket-iota.vercel.app/nouveauDeplacement`, {
                     id_user: this.idUser,
                     id_valet: this.user._id,
                     prix: this.user.price

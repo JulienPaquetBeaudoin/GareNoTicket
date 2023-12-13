@@ -75,7 +75,7 @@ export default {
         },
         async submitLogin() {
             if(this.validateForm()) {
-                axios.post('http://localhost:3000/auth/login', {
+                axios.post('https://gare-no-ticket-iota.vercel.app/auth/login', {
                     email: this.email,
                     password: this.password
                 })

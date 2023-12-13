@@ -102,7 +102,7 @@ export default {
     methods: {
         async getFactureUser() {
             try {
-                const response = await axios.get('http://localhost:3000/facture', {
+                const response = await axios.get('https://gare-no-ticket-iota.vercel.app/facture', {
                     headers: {
                         Authorization: `Bearer ${this.token}`
                     }
@@ -119,7 +119,7 @@ export default {
         },
         async getHistoriqueFacture() {
             try {
-                const response = await axios.get('http://localhost:3000/historique', {
+                const response = await axios.get('https://gare-no-ticket-iota.vercel.app/historique', {
                     headers: {
                         Authorization: `Bearer ${this.token}`
                     }
@@ -132,7 +132,7 @@ export default {
         async payerFacture() {
             try {
                 const reponse = await axios.put(
-                    'http://localhost:3000/effectuerPaiement',
+                    'https://gare-no-ticket-iota.vercel.app/effectuerPaiement',
                     {
                         price: this.montantAPayer
                     },

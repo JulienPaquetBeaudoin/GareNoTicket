@@ -149,7 +149,7 @@ export default {
         },
         async getVoitureParked() {
             try {
-                const response = await axios.get('http://localhost:3000/users')
+                const response = await axios.get('https://gare-no-ticket-iota.vercel.app/users')
                 this.users = response.data
                 this.parkedMarker(response.data)
             } catch (error) {

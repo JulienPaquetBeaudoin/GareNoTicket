@@ -123,7 +123,7 @@ export default {
         },
         submitResgister() {
             if (this.validateForm()) {
-                axios.post('http://localhost:3000/auth/signup', {
+                axios.post('https://gare-no-ticket-iota.vercel.app/auth/signup', {
                     email: this.email,
                     username: this.nom,
                     password: this.password,

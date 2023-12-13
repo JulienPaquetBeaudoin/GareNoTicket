@@ -162,7 +162,7 @@ export default {
             try {
                 this.isDisabled = true
                 this.isDisabledRecup = false
-                const response = await axios.put(`http://localhost:3000/car/location/${this.user.voiture}`, {
+                const response = await axios.put(`https://gare-no-ticket-iota.vercel.app/car/location/${this.user.voiture}`, {
                     latitude: this.latitude,
                     longitude: this.longitude
                 })
@@ -179,7 +179,7 @@ export default {
                 this.marker.dragging.enable()
                 this.isDisabled = false
                 this.isDisabledRecup = true
-                const response = await axios.put(`http://localhost:3000/car/recup-car/${this.user.voiture}`)
+                const response = await axios.put(`https://gare-no-ticket-iota.vercel.app/car/recup-car/${this.user.voiture}`)
                 this.$store.commit('updateVoiture', response.data.voiture);
                 this.toast.success("Vous avez récupéré votre voiture!",{
                     timeout: 1500,

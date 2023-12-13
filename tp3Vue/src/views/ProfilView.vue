@@ -237,7 +237,7 @@ export default {
                             localStorage.removeItem('jwt')
 
                             const response = await axios.put(
-                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
                                 {
                                     username: this.user.username,
                                     email: this.user.email,
@@ -271,7 +271,7 @@ export default {
                     try {
                         localStorage.removeItem('jwt')
                         const response = await axios.put(
-                            `http://localhost:3000/auth/profil-valet-update/${id_user}`,
+                            `https://gare-no-ticket-iota.vercel.app/auth/profil-valet-update/${id_user}`,
                             {
                                 username: this.user.username,
                                 email: this.user.email,
@@ -410,11 +410,9 @@ export default {
             }
         },
         async updateVoiture() {
-            let id_user
-            if (this.user.userId === null) {
+            let id_user = this.user.userId
+            if (id_user == null) {
                 id_user = this.user._id
-            } else {
-                id_user = this.user.userId
             }
             if (this.validateCarInfo()) {
                 if (this.user.voiture != null) {
@@ -423,7 +421,7 @@ export default {
                             localStorage.removeItem('jwt')
                             if (this.user.voiture != null) {
                                 const response = await axios.put(
-                                    `http://localhost:3000/auth/profil-update/${id_user}`,
+                                    `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
                                     {
                                         username: this.user.username,
                                         email: this.user.email,
@@ -441,7 +439,7 @@ export default {
                                 this.$store.commit('updateUser', response.data.user)
                             } else {
                                 const response = await axios.put(
-                                    `http://localhost:3000/auth/profil-update/${id_user}`,
+                                    `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
                                     {
                                         username: this.user.username,
                                         email: this.user.email,
@@ -476,7 +474,7 @@ export default {
                         localStorage.removeItem('jwt')
                         if (this.user.voiture != null) {
                             const response = await axios.put(
-                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
                                 {
                                     username: this.user.username,
                                     email: this.user.email,
@@ -494,7 +492,7 @@ export default {
                             this.$store.commit('updateUser', response.data.user)
                         } else {
                             const response = await axios.put(
-                                `http://localhost:3000/auth/profil-update/${id_user}`,
+                                `https://gare-no-ticket-iota.vercel.app/auth/profil-update/${id_user}`,
                                 {
                                     username: this.user.username,
                                     email: this.user.email,
@@ -529,7 +527,7 @@ export default {
         async deleteUser() {
             try {
                 let token = localStorage.getItem('jwt')
-                await axios.delete(`http://localhost:3000/user/`, {
+                await axios.delete(`https://gare-no-ticket-iota.vercel.app/user/`, {
                     headers: {
                         Authorization: `Bearer ${token}`
                     }
