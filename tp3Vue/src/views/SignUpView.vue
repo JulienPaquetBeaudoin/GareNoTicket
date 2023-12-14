@@ -90,17 +90,18 @@ export default {
         }
     },
     methods: {
+        // Valider le formulaire de connexion
         validateForm(){
             let isValid = false
             this.usernameError = ''
             this.emailError = ''
             this.passwordError = ''
             let regex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
-
+            // Vérifier l'e-mail
             if (!this.nom) {
                 this.usernameError = 'Veuillez entrer votre nom'
             }
-
+            // Vérifier l'e-mail
             if (!this.email) {
                 this.emailError = 'Veuillez entrer votre courriel'
             } else { 
@@ -109,6 +110,7 @@ export default {
                 }
             }
 
+            // Vérifier le mot de passe
             if (!this.password) {
                 this.passwordError = 'Veuillez entrer votre mot de passe'
             } else if (this.password !== this.confirmPassword) {
@@ -121,6 +123,7 @@ export default {
 
             return isValid
         },
+        // Soumettre le formulaire de connexion
         submitResgister() {
             if (this.validateForm()) {
                 axios.post('https://gare-no-ticket-iota.vercel.app/auth/signup', {

@@ -4,7 +4,7 @@ const config = require("../config");
 const User = require("../models/user");
 const Car = require("../models/voiture");
 
-
+// Permet de connecter un utilisateur
 exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -52,6 +52,7 @@ exports.login = (req, res, next) => {
     .catch((err) => next(err));
 };
 
+// Permet de créer un nouvel utilisateur
 exports.signup = (req, res, next) => {
   const { email, username, password, confirmPassword } = req.body;
 
@@ -88,7 +89,7 @@ exports.signup = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-
+// Permet de mettre à jour le profil de l'utilisateur
 exports.updateProfile = (req, res, next) => {
   const userId = req.params.userId;
   const { email, username, userChange, carChange, marque, modele, couleur, plaque } = req.body;
@@ -159,7 +160,7 @@ exports.updateProfile = (req, res, next) => {
       .catch((err) => next(err));
 };
 
-
+// Permet de mettre à jour le profil du valet ou de l'utilisateur qui n'a pas de voiture
 exports.updateProfileValet = (req, res, next) => {
   const userId = req.params.userId;
   const { email, username, price } = req.body;

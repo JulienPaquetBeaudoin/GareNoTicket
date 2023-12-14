@@ -8,6 +8,7 @@ const users = require("../seeds/users");
 const historiques = require("../seeds/historiques");
 const factures = require("../seeds/factures");
 
+// Permet de faire la bd
 exports.seed = async (req, res, next) => {
   const result = {};
 

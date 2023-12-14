@@ -100,6 +100,8 @@ export default {
         return { toast }
     },
     methods: {
+
+        // Récupérer les factures de l'utilisateur
         async getFactureUser() {
             try {
                 const response = await axios.get('https://gare-no-ticket-iota.vercel.app/facture', {
@@ -110,13 +112,18 @@ export default {
                 this.factures = response.data.factures
             } catch (error) {
                 console.log(error)
+                this.toast.error(`Une erreur est survenue`), {
+                    timeout: 2000
+                }
             }
         },
+        // Calculer le montant à payer
         calculerMontantAPayer() {
             this.montantAPayer = Object.values(this.historique).reduce((total, facture) => {
                 return facture.isPaid ? total : total + facture.price
             }, 0)
         },
+        // Récupérer l'historique des factures
         async getHistoriqueFacture() {
             try {
                 const response = await axios.get('https://gare-no-ticket-iota.vercel.app/historique', {
@@ -127,8 +134,12 @@ export default {
                 this.historique = response.data.histo
             } catch (error) {
                 console.log(error)
+                this.toast.error(`Une erreur est survenue`), {
+                    timeout: 2000
+                }
             }
         },
+        // Payer la facture
         async payerFacture() {
             try {
                 const reponse = await axios.put(
@@ -152,6 +163,10 @@ export default {
                     }
             } catch (error) {
                 console.log(error)
+                this.toast.error(`Une erreur est survenue`),
+                    {
+                        timeout: 2000
+                    }
             }
         }
     },

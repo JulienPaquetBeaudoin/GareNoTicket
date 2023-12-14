@@ -1,9 +1,10 @@
 const Histo = require('../models/historique');
 const Facture = require('../models/facture');
 
+// Permet de récupérer l'historique d'un utilisateur
 exports.getHistorique = async (req, res, next) => {
   const userId = req.user.userId;
-  console.log('userId', userId)
+  
   try {
     const histo = await Histo
     .find({ userId: userId })
@@ -22,6 +23,7 @@ exports.getHistorique = async (req, res, next) => {
   }
 }
 
+// Permet de faire un nouveau déplacement
 exports.nouveauDeplacement = async (req, res, next) => {
   const { id_user, id_valet, prix  } = req.body;
   try {
@@ -43,6 +45,7 @@ exports.nouveauDeplacement = async (req, res, next) => {
   }
 }
 
+// Permet d'effectuer un paiement
 exports.effectuerPaiement = async (req, res, next) => {
   const userId = req.user.userId;
   const { price } = req.body;
@@ -68,6 +71,7 @@ exports.effectuerPaiement = async (req, res, next) => {
   }
 }
 
+// Permet de récupérer les factures d'un utilisateur
 exports.getFacture = async (req, res, next) => {
   const userId = req.user.userId;
   try{

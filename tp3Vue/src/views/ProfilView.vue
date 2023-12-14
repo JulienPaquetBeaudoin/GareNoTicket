@@ -168,12 +168,15 @@ export default {
         }
     },
     methods: {
+        // Détecter les changements dans les informations de l'utilisateur
         detectChangeInfoUser() {
             this.isChangedUser = false
         },
+        // Détecter les changements dans les informations de la voiture
         detectChangeInfoVoiture() {
             this.isChangedVoiture = false
         },
+        // Valider le formulaire de l'utilisateur
         vaildateUserForm() {
             let isValid = false
             this.isValidUsername = false
@@ -182,6 +185,7 @@ export default {
             this.champErrorUser = ''
             let regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
+            // Vérifier le nom
             if (!this.user.username) {
                 this.isValidUsername = false
                 this.champErrorUser += 'Veuillez entrer votre nom<br/>'
@@ -191,7 +195,7 @@ export default {
             } else {
                 this.isValidUsername = true
             }
-
+            // Vérifier le prix
             if (this.user.isValet) {
                 if (!this.user.price) {
                     this.isValidPrice = false
@@ -203,7 +207,7 @@ export default {
                     this.isValidPrice = true
                 }
             }
-
+            // Vérifier le courriel
             if (!this.user.email) {
                 this.isValidEmail = false
                 this.champErrorUser += 'Veuillez entrer votre courriel<br/>'
@@ -225,6 +229,7 @@ export default {
 
             return isValid
         },
+        // Mettre à jour les informations de l'utilisateur
         async updateUser() {
             let id_user = this.user.userId
             if (id_user == null) {
@@ -250,7 +255,6 @@ export default {
                                     plaque: this.voiture.plaque
                                 }
                             )
-                            console.log('Reponse', response)
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
@@ -262,6 +266,7 @@ export default {
                                 }
                             }
                             console.log(error)
+                            this.toast.error('Une erreur est survenue')
                         }
                     else {
                         this.toast.error(
@@ -279,8 +284,6 @@ export default {
                                 price: this.user.price
                             }
                         )
-                        console.log('Reponse', response)
-
                         localStorage.setItem('jwt', response.data.token)
                         this.$store.commit('updateVoiture', null)
                         this.$store.commit('updateUser', response.data.user)
@@ -292,10 +295,12 @@ export default {
                             }
                         }
                         console.log(error)
+                        this.toast.error('Une erreur est survenue')
                     }
                 }
             }
         },
+        // Valider le formulaire de la voiture
         validateCarInfo() {
             let isValid = false
             this.isValidMarque = false
@@ -304,7 +309,9 @@ export default {
             this.isValidPlaque = false
             this.champErrorCar = ''
 
+            
             if (this.user.voiture != null) {
+                // Vérifier la marque
                 if (!this.voiture.marque) {
                     this.isValidMarque = false
                     this.champErrorCar += 'Veuillez entrer la marque de votre voiture<br/>'
@@ -314,7 +321,7 @@ export default {
                 } else {
                     this.isValidMarque = true
                 }
-
+                // Vérifier le modèle
                 if (!this.voiture.modele) {
                     this.isValidModele = false
                     this.champErrorCar += 'Veuillez entrer le modèle de votre voiture<br/>'
@@ -324,7 +331,7 @@ export default {
                 } else {
                     this.isValidModele = true
                 }
-
+                // Vérifier la couleur
                 if (!this.voiture.couleur) {
                     this.isValidCouleur = false
                     this.champErrorCar += 'Veuillez entrer la couleur de votre voiture<br/>'
@@ -335,7 +342,7 @@ export default {
                 } else {
                     this.isValidCouleur = true
                 }
-
+                // Vérifier la plaque
                 if (!this.voiture.plaque) {
                     this.isValidPlaque = false
                     this.champErrorCar += 'Veuillez entrer la plaque de votre voiture<br/>'
@@ -357,6 +364,7 @@ export default {
 
                 return isValid
             } else {
+                // Vérifier la marque
                 if (!this.marqueNull) {
                     this.isValidMarque = false
                     this.champErrorCar += 'Veuillez entrer la marque de votre voiture<br/>'
@@ -366,7 +374,7 @@ export default {
                 } else {
                     this.isValidMarque = true
                 }
-
+                // Vérifier le modèle
                 if (!this.modeleNull) {
                     this.isValidModele = false
                     this.champErrorCar += 'Veuillez entrer le modèle de votre voiture<br/>'
@@ -376,7 +384,7 @@ export default {
                 } else {
                     this.isValidModele = true
                 }
-
+                // Vérifier la couleur
                 if (!this.couleurNull) {
                     this.isValidCouleur = false
                     this.champErrorCar += 'Veuillez entrer la couleur de votre voiture<br/>'
@@ -387,7 +395,7 @@ export default {
                 } else {
                     this.isValidCouleur = true
                 }
-
+                // Vérifier la plaque
                 if (!this.plaqueNull) {
                     this.isValidPlaque = false
                     this.champErrorCar += 'Veuillez entrer la plaque de votre voiture<br/>'
@@ -410,6 +418,7 @@ export default {
                 return isValid
             }
         },
+        // Mettre à jour les informations de la voiture
         async updateVoiture() {
             let id_user = this.user.userId
             if (id_user == null) {
@@ -434,7 +443,6 @@ export default {
                                         plaque: this.voiture.plaque
                                     }
                                 )
-                                console.log('Reponse', response)
                                 localStorage.setItem('jwt', response.data.token)
                                 this.$store.commit('updateVoiture', response.data.voiture)
                                 this.$store.commit('updateUser', response.data.user)
@@ -453,7 +461,6 @@ export default {
                                         plaque: this.plaqueNull
                                     }
                                 )
-                                console.log('Reponse', response)
                                 localStorage.setItem('jwt', response.data.token)
                                 this.$store.commit('updateVoiture', response.data.voiture)
                                 this.$store.commit('updateUser', response.data.user)
@@ -466,6 +473,7 @@ export default {
                                 }
                             }
                             console.log(error)
+                            this.toast.error('Une erreur est survenue')
                         }
                     } else {
                         this.toast.error(
@@ -489,7 +497,6 @@ export default {
                                     plaque: this.voiture.plaque
                                 }
                             )
-                            console.log('Reponse', response)
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
@@ -508,7 +515,6 @@ export default {
                                     plaque: this.plaqueNull
                                 }
                             )
-                            console.log('Reponse', response)
                             localStorage.setItem('jwt', response.data.token)
                             this.$store.commit('updateVoiture', response.data.voiture)
                             this.$store.commit('updateUser', response.data.user)
@@ -521,14 +527,17 @@ export default {
                             }
                         }
                         console.log(error)
+                        this.toast.error('Une erreur est survenue')
                     }
                 }
             }
         },
+        // Confirmation de la suppression du compte
         confirmationDelete() {
             this.isConfirmDelete = true
             this.toast.warning('Etês-vous sûr de vouloir supprimer votre compte?')
         },
+        // Supprimer le compte
         async deleteUser() {
             try {
                 let token = localStorage.getItem('jwt')
@@ -548,6 +557,7 @@ export default {
                     }
                 }
                 console.log(error)
+                this.toast.error('Une erreur est survenue')
             }
         }
     },
@@ -556,7 +566,6 @@ export default {
     },
     mounted() {
         this.$store.dispatch('getUser')
-        console.log('user init', this.user)
     },
     setup() {
         const toast = useToast()

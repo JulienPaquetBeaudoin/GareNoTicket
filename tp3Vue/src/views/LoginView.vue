@@ -44,11 +44,13 @@ export default {
     ...mapState(['user'])
     },
     methods: {
+        // Valider le formulaire de connexion
         validateForm() {
             let isValid = false
             this.isValidEmail = false
             this.champError = ''
 
+            // Vérifier l'e-mail
             if (!this.email) {
                 this.isValidEmail = false
                 this.champError += 'Veuillez entrer votre courriel<br/>'
@@ -60,6 +62,7 @@ export default {
                 this.isValidEmail = true
             }
 
+            // Vérifier le mot de passe
             if (!this.password) {
                 this.isValidPassword = false
                 this.champError += 'Veuillez entrer votre mot de passe<br/>'
@@ -67,12 +70,14 @@ export default {
                 this.isValidPassword = true
             }
 
+            // Vérifier la validité de l'e-mail et du mot de passe
             if (this.isValidEmail && this.isValidPassword) {
                 isValid = true
             }
 
             return isValid
         },
+        // Soumettre le formulaire de connexion
         async submitLogin() {
             if(this.validateForm()) {
                 axios.post('https://gare-no-ticket-iota.vercel.app/auth/login', {

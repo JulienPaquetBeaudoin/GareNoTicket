@@ -4,7 +4,7 @@ const Histo = require('../models/historique');
 const config = require('../config');
 const url_base = config.URL + ":" + config.PORT;
 
-
+// Permet de chercher tous les utilisateurs
 exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find({ isValet: false }).populate({
@@ -27,6 +27,7 @@ exports.getUsers = async (req, res, next) => {
   }
 };
 
+// Permet de chercher un utilisateur
 exports.getUser = async (req, res, next) => {
   try {
     const userId = req.user.userId;
@@ -42,10 +43,10 @@ exports.getUser = async (req, res, next) => {
   }
 };
 
+// Permet de chercher un utilisateur par son ID
 exports.getUserById = async (req, res, next) => {
   try {
     const userId = req.params.id;
-    console.log(userId);
     const user = await checkUserExists(userId);
     res.status(200).json({
       user: user
@@ -55,6 +56,7 @@ exports.getUserById = async (req, res, next) => {
   }
 };
 
+// Permet de chercher la voiture d'un utilisateur
 exports.getUserCar = async (req, res, next) => {
   try {
     const voitureId = req.params.id;
@@ -72,6 +74,7 @@ exports.getUserCar = async (req, res, next) => {
   }
 };
 
+//Permet de mettre à jour la position de la voiture
 exports.updateCarLocation = async (req, res, next) => {
   try {
     const voitureId = req.params.id;
@@ -96,8 +99,6 @@ exports.updateCarLocation = async (req, res, next) => {
       offset = -4; // Décalage pour avril à octobre
     }
     now.setHours(now.getHours() + offset);
-    console.log("Now", now);
-    console.log("Hours",now.getHours());
     
     if ((now.getHours() >= 9 && now.getHours() < 11) || (now.getHours() === 13 && now.getMinutes() >= 30) || (now.getHours() > 13 && now.getHours() < 17)) {
       voiture.timeToLeave = new Date(now.getTime() + 60*60000); // Ajoute 60 minutes à l'heure actuelle
@@ -130,6 +131,7 @@ exports.updateCarLocation = async (req, res, next) => {
   }
 };
 
+// Permet de bouger une voiture
 exports.moveCar = async (req, res, next) => {
   try {
     const voitureId = req.params.id;
@@ -153,6 +155,7 @@ exports.moveCar = async (req, res, next) => {
   }
 };
 
+// Permet de récupérer une voiture
 exports.recupVoiture = async (req, res, next) => {
   try {
     const voitureId = req.params.id;
@@ -177,9 +180,7 @@ exports.recupVoiture = async (req, res, next) => {
 };
 
 
-
-
-
+// Permet de supprimer un utilisateur
 exports.deleteUser = async (req, res, next) => {
   try {
     const userId = req.user.userId;

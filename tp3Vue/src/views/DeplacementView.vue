@@ -78,13 +78,16 @@ export default {
     },
     // Les méthodes de l'application
     methods: {
+        // Initialisation de la carte
         initMap() {
             this.map = L.map('mapContainer').setView([this.latitude, this.longitude], 16);
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(this.map);
         },
+        // Trouver la position de l'utilisateur
         findUserLocation() {
+            // Définition de l'icône rouge
             var redIcon = new L.Icon({
                 iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
                 shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -93,12 +96,14 @@ export default {
                 popupAnchor: [1, -34],
                 shadowSize: [41, 41]
             });
+            // Vérification de la géolocalisation
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     const { latitude, longitude } = position.coords;
                     this.latitude = latitude;
                     this.longitude = longitude;
                     this.map.setView([latitude, longitude], 13);
+                    // Ajout du marqueur du valet à la carte
                     this.markerValet = L.marker([latitude, longitude], {
                         icon: redIcon,
                         draggable: false
@@ -114,11 +119,12 @@ export default {
                 console.error("La géolocalisation n'est pas supportée par votre navigateur.");
             }
         },
+        // Trouver la voiture garée
         async getVoitureParked() {
             try {
                 const response = await axios.get(`https://gare-no-ticket-iota.vercel.app/car/${this.idCar}`);
                 this.car = response.data.voiture;
-                console.log('response', response.data);
+                // Ajout du marqueur de la voiture à la carte
                 this.markerCar = L.marker([response.data.voiture.latitude, response.data.voiture.longitude], {
                     draggable: false
                 }).addTo(this.map);
@@ -127,6 +133,7 @@ export default {
                 console.error(error);
             }
         },
+        // Déplacer la voiture
         async moveCar() {
             try {
                 this.markerValet.dragging.enable();
@@ -143,14 +150,17 @@ export default {
                 console.error(error);
             }
         },
+        // Confirmer le déplacement de la voiture
         async confirmation() {
             try {
                 const token = localStorage.getItem('jwt');
                 const position = this.markerValet.getLatLng();
+                // Mettre à jour la position de la voiture
                 await axios.put(`https://gare-no-ticket-iota.vercel.app/car/location/${this.idCar}`, {
                     latitude: position.lat,
                     longitude: position.lng
                 });
+                // Enregistrer le nouveau déplacement
                 await axios.put(`https://gare-no-ticket-iota.vercel.app/nouveauDeplacement`, {
                     id_user: this.idUser,
                     id_valet: this.user._id,
@@ -161,6 +171,7 @@ export default {
                     }
                 });
                 this.markerValet.dragging.disable();
+                // Ajout du marqueur de la voiture à la nouvelle position
                 this.markerCar = L.marker([position.lat, position.lng], {
                     draggable: false
                 }).addTo(this.map);
@@ -175,11 +186,13 @@ export default {
                 console.error(error);
             }
         },
+        // Centrer la carte sur le marqueur du valet
         centerMapOnMarkerValet() {
             if (this.markerValet) {
                 this.map.setView(this.markerValet.getLatLng(), 13);
             }
         },
+        // Centrer la carte sur le marqueur de la voiture
         centerMapOnMarkerVoiture() {
             if (this.markerCar) {
                 this.map.setView(this.markerCar.getLatLng(), 13);
@@ -190,6 +203,7 @@ export default {
                 });
             }
         },
+        // Retourner vers la page du valet
         retournerVersValet(){
             this.$router.push({ name: 'Valet' });
         }

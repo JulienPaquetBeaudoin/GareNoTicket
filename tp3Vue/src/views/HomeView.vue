@@ -75,6 +75,7 @@ export default {
         ...mapState(['user', 'voiture']),
     },
     methods: {
+        // Initialiser la carte
         initMap() {
             this.map = L.map('mapContainer').setView([this.latitude, this.longitude], 16)
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -82,15 +83,13 @@ export default {
                     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(this.map)
         },
+        // Trouver la position de l'utilisateur
         findUserLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         let latitude, longitude
-                        console.log('user:', this.user)
-                        console.log('voiture:', this.voiture)
                         if(this.user == null) {
-                            console.log('user null')
                             this.$router.push({ name: 'Login' })
                         }
                         else if (this.user.price >= 20){
@@ -100,7 +99,6 @@ export default {
                         }
                         else{
                             if(this.voiture.isParked) {
-                                console.log('voiture true')
                                 latitude = this.voiture.latitude
                                 longitude = this.voiture.longitude
                                 this.isDisabled = true
@@ -109,7 +107,6 @@ export default {
                             else {
                                 if(this.voiture.isMoving)
                                 {
-                                    console.log('voiture moving')
                                     latitude = position.coords.latitude
                                     longitude = position.coords.longitude
                                     this.isDisabled = true
@@ -117,7 +114,6 @@ export default {
                                     this.isMoving = true
                                 }
                                 else{
-                                    console.log('voiture false')
                                     latitude = position.coords.latitude
                                     longitude = position.coords.longitude
                                     this.isDisabled = false
@@ -133,7 +129,6 @@ export default {
                         this.marker = L.marker([latitude, longitude], { draggable: true }).addTo(
                             this.map
                         )
-
                     },
                     (error) => {
                         console.error('erreur:', error)
@@ -148,6 +143,7 @@ export default {
                 this.toast.error("La géolocalisation n'est pas supportée par votre navigateur.")
             }
         },
+        // Laisser la voiture
         laisserVoiture() {
             this.marker.dragging.disable()
             const position = this.marker.getLatLng()
@@ -156,8 +152,8 @@ export default {
             this.toast.info("Veuillez vérifier que votre voiture est bien stationnée à l'endroit indiqué sur la carte, ou déplacer lemarqueur sur la position de votre voiture.",{
                 timeout: 7000,
             });
-
         },
+        // Confirmation de la position de la voiture
         async confirmation() {
             try {
                 this.isDisabled = true
@@ -174,6 +170,7 @@ export default {
                 console.error('Erreur axios:', error)
             }
         },
+        // Récupérer la voiture
         async recupererVoiture() {
             try{
                 this.marker.dragging.enable()
@@ -189,6 +186,7 @@ export default {
                 console.error('Erreur axios:', error)
             } 
         },
+        // Centrer la carte sur le marqueur
         centerMapOnMarker() {
             if (this.marker) {
                 this.map.setView(this.marker.getLatLng(), 13);
@@ -200,7 +198,6 @@ export default {
         this.initMap()
         this.findUserLocation()
     },
-    
 }  
 </script>
 

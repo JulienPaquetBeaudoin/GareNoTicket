@@ -88,7 +88,6 @@ export default {
         }
     },
     async mounted() {
-        console.log('mounted called')
         this.initMap()
         this.findUserLocation()
         this.getVoitureParked()
@@ -104,6 +103,7 @@ export default {
         MainTitle,
     },
     methods: {
+        // Initialiser la carte
         initMap() {
             this.map = L.map('mapContainer').setView([this.latitude, this.longitude], 16)
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -111,6 +111,7 @@ export default {
                     '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(this.map)
         },
+        // Trouver la position de l'utilisateur
         findUserLocation() {
             var redIcon = new L.Icon({
                 iconUrl:
@@ -148,6 +149,7 @@ export default {
                 console.error("La géolocalisation n'est pas supportée par votre navigateur.")
             }
         },
+        // Trouver la voiture garée
         async getVoitureParked() {
             try {
                 const response = await axios.get('https://gare-no-ticket-iota.vercel.app/users')
@@ -157,8 +159,8 @@ export default {
                 console.error(error)
             }
         },
+        // Ajouter un marqueur pour chaque voiture garée
         parkedMarker(users) {
-            console.log('parkedMarker called')
             var greenIcon = new L.Icon({
                 iconUrl:
                     'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png',
@@ -183,27 +185,28 @@ export default {
                 }
             }
         },
+        // Mettre à jour le temps restant
         updateRemainingTimes() {
             this.usersArray.forEach((user) => {
                 this.tempsRestant(user)
             })
         },
+        // Calculer le temps restant
         tempsRestant(user) {
             const dateFuture = new Date(user.voiture.timeToLeave)
             let currentMonth = dateFuture.getMonth();
-            if (currentMonth >= 10 || currentMonth <= 2) { // Les mois en JavaScript sont de 0 (janvier) à 11 (décembre)
+            // Si le mois est entre octobre et février, ajouter 5 heures, sinon ajouter 4 heures
+            if (currentMonth >= 10 || currentMonth <= 2) { 
                 dateFuture.setHours(dateFuture.getHours() + 5);
             } else {
                 dateFuture.setHours(dateFuture.getHours() + 4);
             }
             const dateNow = new Date()
-            console.log('user', user.username)
-            console.log('dateFuture', dateFuture)
-            console.log('dateNow', dateNow)
             this.remainingTimes[user._id] = Math.round(
                 (dateFuture.getTime() - dateNow.getTime()) / 1000
             )
         },
+        // Centrer la carte sur la voiture sélectionnée
         centerMapOnUser(user) {
             if (user && user.voiture) {
                 this.map.setView(
@@ -216,6 +219,7 @@ export default {
                     .openOn(this.map);
             }
         },
+        // Naviguer vers la page de déplacement
         navigateDeplacement(idVoiture, idUser) {       
             this.$router.push({ name: 'Deplacement', params: { id_voiture: idVoiture, id_user: idUser } })
             // this.$router.push({ path: `/deplacement/${idVoiture}/${idUser}` })
